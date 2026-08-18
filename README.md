@@ -41,6 +41,10 @@ rm -rf ~/.local/state/omarchy/plugins/io.github.fernandomenolli.sill
 
 *The shelf in the bar, holding four.*
 
+The icon is an outline while the shelf is empty and fills in when it is
+holding something, with the count beside it. No colour changes: nothing on a
+shelf is urgent, and red in this bar means something is the matter.
+
 | Action | What happens |
 |---|---|
 | Drag a file onto the bar icon | it lands on the shelf; the panel opens so the whole panel becomes a target |

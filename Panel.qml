@@ -70,8 +70,12 @@ Panel {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: root.vertical || shelf.count === 0 ? "󰏗" : "󰏗 " + shelf.count
-    active: shelf.count > 0
+    // Empty is an outline, holding something is filled in. The shelf has no
+    // urgency to report — nothing here is waiting on you or going wrong — so
+    // it says how full it is by weight rather than by turning the colour every
+    // other widget uses to mean something is the matter.
+    readonly property string mark: shelf.count === 0 ? "󱈎" : "󰀼"
+    text: root.vertical || shelf.count === 0 ? mark : mark + " " + shelf.count
     tooltipText: shelf.count === 0
       ? "Sill — drag a file here to set it down"
       : Format.countLabel(shelf.count) + " on the shelf"
@@ -146,7 +150,7 @@ Panel {
             meta: root.notice !== "" ? root.notice : Format.countLabel(shelf.count)
             iconComponent: Component {
               Text {
-                text: "󰏗"
+                text: shelf.count === 0 ? "󱈎" : "󰀼"
                 color: root.foreground
                 font.family: root.fontFamily
                 font.pixelSize: Style.font.display
