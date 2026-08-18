@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.fernandomenolli.sill",
+  "name": "Sill",
+  "version": "0.1.0",
+  "author": "Fernando Menolli",
+  "license": "MIT",
+  "description": "A shelf on the bar. Drop files on it from anywhere, carry them across workspaces, and paste them where they belong.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Sill",
+    "description": "Drag files onto the bar to set them down, then copy them out wherever you need them. Nothing is moved or duplicated on disk — the shelf holds references.",
+    "category": "Productivity",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "openOnDrag": true,
+      "clearOnCopy": false,
+      "maxItems": 25
+    },
+    "schema": [
+      {
+        "key": "openOnDrag",
+        "type": "boolean",
+        "label": "Open the shelf when a drag reaches the bar",
+        "defaultValue": true,
+        "description": "Gives you the whole panel to drop into instead of the icon."
+      },
+      {
+        "key": "clearOnCopy",
+        "type": "boolean",
+        "label": "Empty the shelf after copying everything",
+        "defaultValue": false
+      },
+      {
+        "key": "maxItems",
+        "type": "integer",
+        "label": "Maximum items on the shelf",
+        "min": 5,
+        "max": 100,
+        "step": 5,
+        "defaultValue": 25
+      }
+    ]
+  }
+}
