@@ -82,25 +82,7 @@ test("isImage recognises the extensions worth showing a thumbnail for", () => {
   eq(Shelf.isImage(Shelf.linkItem("https://x.com/a.png")), false)
 })
 
-test("a file is offered as a uri-list, encoded and CRLF-terminated", () => {
-  eq(Shelf.dragData(Shelf.fileItem("/home/fernando/Notas de reunião.md")),
-     { "text/uri-list": "file:///home/fernando/Notas%20de%20reuni%C3%A3o.md\r\n" })
-})
 
-test("a hash in a filename is encoded, not read as a fragment", () => {
-  eq(Shelf.fileUri("/tmp/nota #3.md"), "file:///tmp/nota%20%233.md\r\n")
-})
 
-test("a link and a line of text are offered as text", () => {
-  eq(Shelf.dragData(Shelf.linkItem("https://omarchy.org")), { "text/plain": "https://omarchy.org" })
-  eq(Shelf.dragData(Shelf.textItem("lembrete")), { "text/plain": "lembrete" })
-})
 
-test("dragging the shelf carries every file on it, one URI per line", () => {
-  const items = [Shelf.fileItem("/a/one.txt"), Shelf.linkItem("https://x.com"), Shelf.fileItem("/a/two.txt")]
-  eq(Shelf.dragAll(items), { "text/uri-list": "file:///a/one.txt\r\nfile:///a/two.txt\r\n" })
-})
 
-test("a shelf with no files offers nothing to drag", () => {
-  eq(Shelf.dragAll([Shelf.linkItem("https://x.com")]), {})
-})

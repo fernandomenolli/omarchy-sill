@@ -85,24 +85,5 @@ function isImage(item) {
   return item.kind === "file" && /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(item.path)
 }
 
-// A path becomes a URI for the drag: percent-encoded, because a folder with a
-// space in it is normal and a raw space in a uri-list is not. The CRLF is
-// what the spec asks for and what file managers look for.
-function fileUri(path) {
-  return "file://" + encodeURI(String(path)).replace(/#/g, "%23") + "\r\n"
-}
 
-// What a row hands over when dragged. A file is offered as a file so the
-// destination copies it; everything else is offered as the text it is.
-function dragData(item) {
-  if (!item) return ({})
-  if (item.kind === "file") return ({ "text/uri-list": fileUri(item.path) })
-  return ({ "text/plain": String(item.path) })
-}
 
-// Everything on the shelf, as one uri-list. Dragging the icon carries the
-// whole shelf, which is what it was filled for.
-function dragAll(items) {
-  var uris = filePaths(items).map(fileUri).join("")
-  return uris === "" ? ({}) : ({ "text/uri-list": uris })
-}

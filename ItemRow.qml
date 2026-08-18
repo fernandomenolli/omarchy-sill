@@ -114,12 +114,7 @@ Item {
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     hoverEnabled: true
-    cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.PointingHandCursor
-    drag.target: dragProxy
-    drag.threshold: 8
-    onPressed: root.grabToImage(function(result) { dragProxy.Drag.imageSource = result.url })
-    drag.onActiveChanged: root.draggingChanged(drag.active)
+    cursorShape: Qt.PointingHandCursor
     onClicked: root.copyRequested()
-    onReleased: { dragProxy.x = 0; dragProxy.y = 0 }
   }
 }
