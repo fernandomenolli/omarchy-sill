@@ -3,6 +3,11 @@
 A shelf on the bar. Drag a file onto it from anywhere, walk away to another
 workspace, and copy it out where it belongs.
 
+![Four things set down: two files, a link, and a line of text.](docs/panel.png)
+
+*Four things set down: two files, a link, and a line of text.*
+
+
 The bar is the one surface a drag can always reach: it is on top of every
 window, on every workspace. That is the whole idea.
 
@@ -31,6 +36,10 @@ rm -rf ~/.local/state/omarchy/plugins/io.github.fernandomenolli.sill
 ```
 
 ## Using it
+
+![The shelf in the bar, holding four.](docs/bar.png)
+
+*The shelf in the bar, holding four.*
 
 | Action | What happens |
 |---|---|
