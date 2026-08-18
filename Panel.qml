@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
 import "model/Shelf.js" as Shelf
+import "model/Capture.js" as Capture
 import "model/Format.js" as Format
 
 // A shelf on the bar. Drag a file up to it from anywhere and let go; the bar
@@ -28,11 +30,32 @@ Panel {
   property string copiedKey: ""
   property string notice: ""
 
+  // Paths a check found gone, by path. The shelf holds references and not
+  // copies, so a file can be moved or deleted from under it at any time, and
+  // the worst moment to discover that is when you paste and nothing arrives.
+  property var missing: ({})
+  readonly property string checkPath: Qt.resolvedUrl("bin/sill-check").toString().replace("file://", "")
+  readonly property string shotPath: Qt.resolvedUrl("bin/sill-latest-shot").toString().replace("file://", "")
+
+  // Off by default, because nothing else here arrives without you putting it
+  // there and that promise is worth more than the convenience. It is the one
+  // exception, and it earns it: a screenshot is already on the clipboard, but
+  // the clipboard holds one, and three screenshots meant for the same message
+  // is the case it cannot serve.
+  readonly property bool catchScreenshots: setting("catchScreenshots", false)
+  property real captureStartedAt: 0
+
 
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
   function copyItem(item) {
+    if (item.kind === "file" && root.missing[item.path]) {
+      notice = "that file is no longer there"
+      noticeReset.restart()
+      return
+    }
+
     if (item.kind === "file") Quickshell.execDetached([clipPath, "files", item.path])
     else Quickshell.execDetached([clipPath, "text", item.path])
 
@@ -41,8 +64,14 @@ Panel {
   }
 
   function copyEverything() {
-    var paths = Shelf.filePaths(shelf.items)
-    if (paths.length === 0) return
+    var paths = Shelf.filePaths(shelf.items, root.missing)
+    if (paths.length === 0) {
+      if (Shelf.checkablePaths(shelf.items).length > 0) {
+        notice = "none of those files are there any more"
+        noticeReset.restart()
+      }
+      return
+    }
 
     Quickshell.execDetached([clipPath, "files"].concat(paths))
     notice = paths.length === 1 ? "1 file on the clipboard" : paths.length + " files on the clipboard"
@@ -65,6 +94,70 @@ Panel {
 
   Timer { id: copiedReset; interval: 1600; onTriggered: root.copiedKey = "" }
   Timer { id: noticeReset; interval: 2200; onTriggered: root.notice = "" }
+
+  // Hyprland announces a screenshot as a capture, the same way it announces a
+  // call, so nothing has to watch a directory: a capture that starts and stops
+  // again immediately was somebody pressing the screenshot key.
+  Connections {
+    target: Hyprland
+    enabled: root.catchScreenshots
+
+    function onRawEvent(event) {
+      if (!event) return
+
+      var parsed = Capture.parseEvent(event.name, event.data)
+      if (!parsed) return
+
+      if (parsed.starting) { root.captureStartedAt = Date.now(); return }
+      if (!Capture.wasScreenshot(root.captureStartedAt, Date.now(), 2000)) return
+
+      root.captureStartedAt = 0
+      if (!shot.running) shot.running = true
+    }
+  }
+
+  Process {
+    id: shot
+    command: [root.shotPath, "10"]
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        var path = String(text).trim()
+        if (path === "") return
+        if (shelf.addFromDrop(["file://" + path], "") > 0) {
+          root.notice = "screenshot set down"
+          noticeReset.restart()
+        }
+      }
+    }
+  }
+
+  // Asked once each time the shelf is opened, which is the only moment the
+  // answer is looked at. Nothing runs while the panel is shut.
+  Process {
+    id: check
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        var gone = {}
+        var lines = String(text).split("\n")
+        for (var i = 0; i < lines.length; i++) {
+          var path = lines[i].trim()
+          if (path !== "") gone[path] = true
+        }
+        root.missing = gone
+      }
+    }
+  }
+
+  onOpenedChanged: {
+    if (!opened) return
+    var paths = Shelf.checkablePaths(shelf.items)
+    if (paths.length === 0) { root.missing = ({}); return }
+    if (check.running) return
+    check.command = [root.checkPath].concat(paths)
+    check.running = true
+  }
 
   WidgetButton {
     id: button
@@ -184,6 +277,7 @@ Panel {
                 foreground: root.foreground
                 fontFamily: root.fontFamily
                 copied: root.copiedKey === modelData.key
+                gone: root.missing[modelData.path] === true
                 onCopyRequested: root.copyItem(modelData)
                 onRemoveRequested: shelf.remove(modelData.key)
               }

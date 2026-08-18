@@ -64,8 +64,13 @@ Links and lines of text can be dropped too, and they copy as text.
 ## What it does not do
 
 **Nothing is moved or duplicated on disk.** The shelf holds references: a
-path, a URL, a line of text. Clearing it never deletes anything, and a file
-you delete elsewhere simply stops working from here.
+path, a URL, a line of text. Clearing it never deletes anything.
+
+A file you delete elsewhere says so. The shelf checks each path when you open
+it, and one that is no longer there goes grey and reads *no longer there*
+instead of its folder. Clicking it tells you rather than putting nothing on
+the clipboard, and *Copy all* leaves it out. Finding this out at the moment
+you paste, and getting silence, is the worst place to find it out.
 
 **You cannot drag back out.** The reason is worth stating precisely, because
 it is not the one you would guess. Wayland is fine with it: a plain
@@ -91,7 +96,27 @@ Under Setup > Plugins.
 |---|---|---|
 | Open the shelf when a drag reaches the bar | on | gives you the whole panel to drop into |
 | Empty the shelf after copying everything | off | for people who treat it as a one-way conveyor |
+| Set a screenshot down as soon as it is taken | off | see below |
 | Maximum items | 25 | the oldest fall off the end |
+
+## Screenshots
+
+Turn on *Set a screenshot down as soon as it is taken* and every screenshot
+lands on the shelf as a file, next to whatever else is there.
+
+A screenshot already goes to the clipboard, so one of them needs no help. The
+case this serves is three of them for the same message: the clipboard holds
+one thing, so by the time you take the third the first two are only files in
+a folder, and gathering them again is the errand this exists to remove.
+
+It costs nothing while nothing is happening. Hyprland announces a screenshot
+as a screen capture, the same way it announces a call, and a capture that
+starts and stops again immediately is somebody pressing the screenshot key.
+Nothing watches a directory and no process is left running.
+
+It is off by default, and deliberately so: everything else here arrives
+because you put it there, and that promise is worth more than the
+convenience. This is the one exception.
 
 ## What it costs
 

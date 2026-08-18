@@ -2,11 +2,13 @@
   "schemaVersion": 1,
   "id": "io.github.fernandomenolli.sill",
   "name": "Sill",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Fernando Menolli",
   "license": "MIT",
   "description": "A shelf on the bar. Drop files on it from anywhere, carry them across workspaces, and paste them where they belong.",
-  "kinds": ["bar-widget"],
+  "kinds": [
+    "bar-widget"
+  ],
   "entryPoints": {
     "barWidget": "Panel.qml"
   },
@@ -19,7 +21,8 @@
     "defaults": {
       "openOnDrag": true,
       "clearOnCopy": false,
-      "maxItems": 25
+      "maxItems": 25,
+      "catchScreenshots": false
     },
     "schema": [
       {
@@ -43,6 +46,13 @@
         "max": 100,
         "step": 5,
         "defaultValue": 25
+      },
+      {
+        "key": "catchScreenshots",
+        "type": "boolean",
+        "label": "Set a screenshot down as soon as it is taken",
+        "defaultValue": false,
+        "description": "A screenshot already goes to the clipboard, but the clipboard holds one thing. Turn this on when you take three of them for the same message."
       }
     ]
   }

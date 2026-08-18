@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Prints the screenshot that was just taken, if one was.
+#
+#   sill-latest-shot [max-age-seconds]
+#
+# Hyprland announces a screenshot as a capture, the same way it announces a
+# call, so the shelf hears about it without watching anything. It still has to
+# find the file, and the only honest way to be sure it is the right one is to
+# refuse anything older than the capture that just ended.
+
+set -uo pipefail
+
+MAX_AGE="${1:-10}"
+DIR="${OMARCHY_SCREENSHOT_DIR:-${XDG_PICTURES_DIR:-$HOME/Pictures}}"
+
+[[ -d $DIR ]] || exit 0
+
+newest=$(find "$DIR" -maxdepth 1 -type f -name 'screenshot-*.png' -newermt "-${MAX_AGE} seconds" \
+  -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+
+[[ -n $newest ]] && printf '%s\n' "$newest"
+exit 0

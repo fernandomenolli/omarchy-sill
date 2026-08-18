@@ -40,3 +40,8 @@ test("subtitle of a link is the address without the scheme noise", () => {
 test("subtitle of a line of text is nothing — the text is already the label", () => {
   eq(Format.subtitle(item("text", "lembrete", ""), HOME), "")
 })
+
+test("subtitle says so when the file is gone", () => {
+  const item = { kind: "file", path: "/a/b.txt", folder: "/a" }
+  eq(Format.subtitle(item, "/home/me", true), "no longer there")
+})

@@ -86,3 +86,12 @@ test("isImage recognises the extensions worth showing a thumbnail for", () => {
 
 
 
+
+// A file can be moved or deleted from under the shelf at any time, because
+// the shelf holds a path and not a copy.
+test("filePaths leaves out what is gone", () => {
+  const items = [Shelf.fileItem("/a/here.txt"), Shelf.fileItem("/a/gone.txt"), Shelf.linkItem("https://x.com")]
+  eq(Shelf.filePaths(items), ["/a/here.txt", "/a/gone.txt"])
+  eq(Shelf.filePaths(items, { "/a/gone.txt": true }), ["/a/here.txt"])
+  eq(Shelf.checkablePaths(items), ["/a/here.txt", "/a/gone.txt"])
+})

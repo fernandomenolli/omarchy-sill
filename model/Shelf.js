@@ -77,7 +77,18 @@ function remove(items, key) {
   return (items || []).filter(function(item) { return item.key !== key })
 }
 
-function filePaths(items) {
+// The file paths on the shelf, skipping any a check has found gone. Copying
+// a path that is no longer there puts nothing on the clipboard and says
+// nothing about it, which is the one way a shelf can lie to you.
+function filePaths(items, gone) {
+  var missing = gone || {}
+  return (items || [])
+    .filter(function(item) { return item.kind === "file" && !missing[item.path] })
+    .map(function(item) { return item.path })
+}
+
+// Everything the shelf is holding that is worth checking for.
+function checkablePaths(items) {
   return (items || []).filter(function(item) { return item.kind === "file" }).map(function(item) { return item.path })
 }
 

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Prints the paths that are no longer there, one a line.
+#
+#   sill-check /path/one /path/two
+#
+# The shelf holds references, not copies, so a file can be moved or deleted
+# from under it at any time. Finding out at the moment you paste, and getting
+# nothing, is the worst place to find out.
+
+set -uo pipefail
+
+for path in "$@"; do
+  [[ -e $path ]] || printf '%s\n' "$path"
+done
+exit 0

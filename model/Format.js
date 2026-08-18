@@ -19,8 +19,9 @@ function countLabel(count) {
 
 // The second line of a row. A file says where it came from; a link says where
 // it goes; a line of text has already said everything it has to say.
-function subtitle(item, home) {
+function subtitle(item, home, gone) {
   if (!item) return ""
+  if (gone) return "no longer there"
   if (item.kind === "file") return folderLabel(item.folder, home)
   if (item.kind === "link") return String(item.path).replace(/^[a-z][a-z0-9+.-]*:\/\//i, "").replace(/\/$/, "")
   return ""

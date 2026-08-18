@@ -17,12 +17,19 @@ Item {
   property color foreground: Color.foreground
   property string fontFamily: Style.font.family
   property bool copied: false
+  property bool gone: false
 
   signal copyRequested()
   signal removeRequested()
 
   readonly property color dim: Qt.darker(foreground, 1.45)
   readonly property bool isImage: item ? Shelf.isImage(item) : false
+
+  // A row for a file that is not there any more is still worth showing: you
+  // put it down for a reason, and being told it is gone is the point. It just
+  // stops looking like something you can use.
+  opacity: gone ? 0.45 : 1
+  Behavior on opacity { NumberAnimation { duration: 160 } }
 
   width: parent ? parent.width : implicitWidth
   implicitHeight: Math.max(Style.space(34), labels.implicitHeight + Style.space(8))
@@ -87,7 +94,7 @@ Item {
     Text {
       width: parent.width
       visible: text !== ""
-      text: root.copied ? "Copied" : Format.subtitle(root.item, root.home)
+      text: root.copied ? "Copied" : Format.subtitle(root.item, root.home, root.gone)
       color: root.copied ? Color.accent : root.dim
       font.family: root.fontFamily
       font.pixelSize: Style.font.caption
