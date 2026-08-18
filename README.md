@@ -79,6 +79,25 @@ Under Setup > Plugins.
 | Empty the shelf after copying everything | off | for people who treat it as a one-way conveyor |
 | Maximum items | 25 | the oldest fall off the end |
 
+## What it costs
+
+Measured on the machine this was built on — AMD, 24 cores, Omarchy 4.0.0.alpha,
+Hyprland 0.56.2 — by reading `utime + stime` from `/proc/<pid>/stat` for the
+`omarchy-shell` process, with the plugin enabled and then disabled. The numbers
+below are the difference. You can repeat it: the method is four lines of shell.
+
+| | Shell alone | With this plugin |
+|---|---|---|
+| Idle, 30 seconds | 10 ms of CPU | 10 ms — no timer, nothing runs |
+| 300 focus switches | 840 ms | 870 ms |
+| Memory | ~500 MB | no measurable change |
+
+The shell's own cost dominates everything here: **2.8 ms of that per focus
+switch is Omarchy itself** — the bar redrawing, the active-window widget, the
+workspace indicators. All five of these plugins together add 0.17 ms on top.
+
+**It does not get heavier as it runs.** Nothing runs unless you drop something on it or click a row. A shelf holding twenty-five items costs exactly what an empty one costs, because nothing walks the list until you open the panel.
+
 ## Tests
 
 ```bash

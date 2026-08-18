@@ -188,6 +188,18 @@ Panel {
 
           PanelSeparator { foreground: root.foreground; visible: shelf.count > 0 }
 
+          // What a row does is not guessable: it looks like a list, and a list
+          // invites dragging. Saying it costs one quiet line.
+          Text {
+            visible: shelf.count > 0
+            width: parent.width
+            wrapMode: Text.Wrap
+            text: "Click an item to copy it — the file itself, not its path, so a paste lands a copy."
+            color: Qt.darker(root.foreground, 1.65)
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+          }
+
           Row {
             visible: shelf.count > 0
             width: parent.width
