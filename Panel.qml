@@ -28,6 +28,7 @@ Panel {
   property string copiedKey: ""
   property string notice: ""
 
+
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
@@ -74,11 +75,12 @@ Panel {
     tooltipText: shelf.count === 0
       ? "Sill — drag a file here to set it down"
       : Format.countLabel(shelf.count) + " on the shelf"
+    // The bar owns pointer input on its own strip and delivers it here, not to
+    // any MouseArea stacked on top. This is the only handler that runs.
     onPressed: function(b) {
       if (b === Qt.RightButton && shelf.count > 0) root.copyEverything()
       else root.toggle()
     }
-
     // The icon is the drop target, and a drag reaching it opens the shelf so
     // the rest of the panel becomes target too. A bar icon is a small thing
     // to aim a file at.
@@ -90,6 +92,7 @@ Panel {
         drop.accept()
       }
     }
+
   }
 
   KeyboardPanel {

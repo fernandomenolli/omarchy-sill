@@ -4,9 +4,11 @@ import qs.Ui
 import "model/Shelf.js" as Shelf
 import "model/Format.js" as Format
 
-// One thing set down on the shelf. The whole row is the copy button, because
-// copying is the only thing anyone opens the shelf to do; the × is the only
-// competing target and it sits at the far edge.
+// One thing set down on the shelf. Clicking it copies it — the file itself,
+// so a paste lands a copy. Dragging happens from the bar icon instead: an
+// open panel covers the screen with the surface that catches the dismissing
+// click, and a drag leaving the panel lands on that rather than on the window
+// underneath.
 Item {
   id: root
 
@@ -112,7 +114,12 @@ Item {
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     hoverEnabled: true
-    cursorShape: Qt.PointingHandCursor
+    cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+    drag.target: dragProxy
+    drag.threshold: 8
+    onPressed: root.grabToImage(function(result) { dragProxy.Drag.imageSource = result.url })
+    drag.onActiveChanged: root.draggingChanged(drag.active)
     onClicked: root.copyRequested()
+    onReleased: { dragProxy.x = 0; dragProxy.y = 0 }
   }
 }
