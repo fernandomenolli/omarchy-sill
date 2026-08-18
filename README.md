@@ -54,9 +54,20 @@ Links and lines of text can be dropped too, and they copy as text.
 a path, a URL, a line of text. Clearing it never deletes anything, and a
 file you delete elsewhere simply stops working from here.
 
-**You cannot drag back out.** Starting a drag from a layer-shell surface is
-not something the shell can do on Wayland today; only receiving one is. So
-the way out is copying, which turned out to be better anyway.
+**You cannot drag back out** — and the reason is worth stating precisely,
+because it is not the one you would guess. Wayland is fine with it: a plain
+layer-shell surface can start a drag that a file manager accepts, verified
+against the protocol trace.
+
+What blocks it is the bar. Omarchy's bar owns the pointer grab across its
+whole strip, because dragging a widget along the bar is how you reorder it —
+so a press inside a widget never reaches the widget. And a drag cannot leave
+an open panel either: the panel keeps a full-screen surface above everything
+to catch the click that dismisses it, and a drag leaving the card lands on
+that instead of on the window underneath.
+
+So the way out is copying — which for the thing this is actually for, five
+files gathered from three folders, beats dragging anyway.
 
 ## Settings
 
