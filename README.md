@@ -90,7 +90,18 @@ dragging can make.
 
 ## Settings
 
-Under Setup > Plugins.
+Omarchy has no settings screen yet, so a setting is a key on this widget's own
+entry in the bar layout of `~/.config/omarchy/shell.json`:
+
+```json
+{
+  "id": "io.github.fernandomenolli.sill",
+  "catchScreenshots": true,
+  "maxItems": 40
+}
+```
+
+The panel has a button that opens that file in your editor.
 
 | Setting | Default | What it does |
 |---|---|---|
