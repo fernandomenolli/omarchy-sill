@@ -17,8 +17,16 @@ Panel {
   moduleName: "io.github.fernandomenolli.sill"
   ipcTarget: "io.github.fernandomenolli.sill"
 
-  readonly property bool openOnDrag: setting("openOnDrag", true)
-  readonly property bool clearOnCopy: setting("clearOnCopy", false)
+  // A preference tapped in the panel wins over one written by hand in
+  // shell.json, which in turn wins over the default. See Preferences.qml for
+  // why the panel does not write shell.json itself.
+  function pref(name, fallback) {
+    prefs.revision
+    return prefs.has(name) ? prefs.get(name, fallback) : setting(name, fallback)
+  }
+
+  readonly property bool openOnDrag: pref("openOnDrag", true)
+  readonly property bool clearOnCopy: pref("clearOnCopy", false)
   readonly property int maxItems: setting("maxItems", 25)
 
   readonly property color foreground: bar ? bar.foreground : Color.foreground
@@ -42,7 +50,7 @@ Panel {
   // exception, and it earns it: a screenshot is already on the clipboard, but
   // the clipboard holds one, and three screenshots meant for the same message
   // is the case it cannot serve.
-  readonly property bool catchScreenshots: setting("catchScreenshots", false)
+  readonly property bool catchScreenshots: pref("catchScreenshots", false)
   property real captureStartedAt: 0
 
 
@@ -81,6 +89,11 @@ Panel {
 
   function openItem(item) {
     Quickshell.execDetached(["xdg-open", item.path])
+  }
+
+  Preferences {
+    id: prefs
+    pluginId: "io.github.fernandomenolli.sill"
   }
 
   ShelfStore {
@@ -298,19 +311,44 @@ Panel {
             font.pixelSize: Style.font.caption
           }
 
-          // Omarchy has no settings screen, so a setting is a key in shell.json and
-          // the honest thing a panel can do is take you to it. Nothing here writes
-          // that file: a plugin editing the config of the person running it is not
-          // a favour, however small the edit.
-          Button {
+          PanelSectionHeader {
             width: parent.width
             text: "Settings"
-            iconText: "\uf013"
             foreground: root.foreground
             fontFamily: root.fontFamily
-            onClicked: Quickshell.execDetached(["omarchy-launch-config-editor",
-              (Quickshell.env("HOME") || "") + "/.config/omarchy/shell.json"])
           }
+
+          Toggle {
+            width: parent.width
+            label: "Catch screenshots"
+            description: "Every screenshot lands here as a file. One is already on your clipboard; this is for the three you took for the same message."
+            checked: root.catchScreenshots
+            foreground: root.foreground
+            fontFamily: root.fontFamily
+            onClicked: prefs.set("catchScreenshots", !root.catchScreenshots)
+          }
+
+          Toggle {
+            width: parent.width
+            label: "Open on drag"
+            description: "A drag reaching the bar opens the shelf, so the whole panel is the target instead of the icon."
+            checked: root.openOnDrag
+            foreground: root.foreground
+            fontFamily: root.fontFamily
+            onClicked: prefs.set("openOnDrag", !root.openOnDrag)
+          }
+
+          Toggle {
+            width: parent.width
+            label: "Empty after Copy all"
+            description: "For treating the shelf as a one-way conveyor rather than a place things stay."
+            checked: root.clearOnCopy
+            foreground: root.foreground
+            fontFamily: root.fontFamily
+            onClicked: prefs.set("clearOnCopy", !root.clearOnCopy)
+          }
+
+          PanelSeparator { foreground: root.foreground }
 
           Row {
             visible: shelf.count > 0
