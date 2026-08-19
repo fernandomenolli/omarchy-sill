@@ -246,7 +246,14 @@ Panel {
 
         Column {
           id: column
-          width: flick.width
+          // The scrollbar is drawn over the content and the rows here run the
+          // full width, so it lands on their borders. The room it needs is
+          // given on both sides rather than one: a gutter on the right alone
+          // makes the two margins different, which is more visible than the
+          // bar ever was.
+          readonly property real gutter: flick.interactive ? Style.space(12) : 0
+          x: gutter
+          width: flick.width - gutter * 2
           spacing: Style.space(10)
 
           PanelHero {
@@ -311,6 +318,32 @@ Panel {
             font.pixelSize: Style.font.caption
           }
 
+          Row {
+            visible: shelf.count > 0
+            width: parent.width
+            spacing: Style.space(8)
+
+            Button {
+              width: (parent.width - Style.space(8)) / 2
+              text: "Copy all"
+              iconText: "󰆏"
+              bordered: true
+              foreground: root.foreground
+              fontFamily: root.fontFamily
+              onClicked: root.copyEverything()
+            }
+
+            Button {
+              width: (parent.width - Style.space(8)) / 2
+              text: "Clear"
+              iconText: "󰎟"
+              bordered: true
+              foreground: root.foreground
+              fontFamily: root.fontFamily
+              onClicked: shelf.clear()
+            }
+          }
+
           PanelSectionHeader {
             width: parent.width
             text: "Settings"
@@ -350,31 +383,6 @@ Panel {
 
           PanelSeparator { foreground: root.foreground }
 
-          Row {
-            visible: shelf.count > 0
-            width: parent.width
-            spacing: Style.space(8)
-
-            Button {
-              width: (parent.width - Style.space(8)) / 2
-              text: "Copy all"
-              iconText: "󰆏"
-              bordered: true
-              foreground: root.foreground
-              fontFamily: root.fontFamily
-              onClicked: root.copyEverything()
-            }
-
-            Button {
-              width: (parent.width - Style.space(8)) / 2
-              text: "Clear"
-              iconText: "󰎟"
-              bordered: true
-              foreground: root.foreground
-              fontFamily: root.fontFamily
-              onClicked: shelf.clear()
-            }
-          }
         }
       }
     }
