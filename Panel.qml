@@ -15,6 +15,7 @@ import "model/Format.js" as Format
 Panel {
   id: root
   moduleName: "io.github.fernandomenolli.sill"
+  manageIpc: false
   ipcTarget: "io.github.fernandomenolli.sill"
 
   // A preference tapped in the panel wins over one written by hand in
@@ -43,6 +44,7 @@ Panel {
   // the worst moment to discover that is when you paste and nothing arrives.
   property var missing: ({})
   readonly property string checkPath: Qt.resolvedUrl("bin/sill-check").toString().replace("file://", "")
+  readonly property string pastePath: Qt.resolvedUrl("bin/sill-paste").toString().replace("file://", "")
   readonly property string shotPath: Qt.resolvedUrl("bin/sill-latest-shot").toString().replace("file://", "")
 
   // Off by default, because nothing else here arrives without you putting it
@@ -96,6 +98,26 @@ Panel {
     pluginId: "io.github.fernandomenolli.sill"
   }
 
+  // Its own handler rather than the base one, so there is somewhere to put
+  // the actions worth binding a key to.
+  IpcHandler {
+    target: "io.github.fernandomenolli.sill"
+    function open(): void { root.open() }
+    function close(): void { root.close() }
+    function toggle(): void { root.toggle() }
+
+    // Stash whatever is on the clipboard without opening anything.
+    function stash(): string {
+      if (!paste.running) paste.running = true
+      return "ok"
+    }
+
+    function copyAll(): string {
+      root.copyEverything()
+      return "ok"
+    }
+  }
+
   ShelfStore {
     id: shelf
     limit: root.maxItems
@@ -126,6 +148,26 @@ Panel {
 
       root.captureStartedAt = 0
       if (!shot.running) shot.running = true
+    }
+  }
+
+  // An image is the one thing you cannot drag onto the shelf: dragging one out
+  // of a web page hands over a link to it rather than the picture. Copying it
+  // hands over the picture, so this is the way in.
+  Process {
+    id: paste
+    command: [root.pastePath]
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        var incoming = Shelf.parsePaste(text)
+        if (incoming.urls.length === 0 && incoming.text === "") {
+          root.notice = "nothing on the clipboard"
+          noticeReset.restart()
+          return
+        }
+        shelf.addFromDrop(incoming.urls, incoming.text)
+      }
     }
   }
 
@@ -316,6 +358,15 @@ Panel {
             color: Qt.darker(root.foreground, 1.65)
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
+          }
+
+          Button {
+            width: parent.width
+            text: "Put the clipboard on the shelf"
+            iconText: "󰆒"
+            foreground: root.foreground
+            fontFamily: root.fontFamily
+            onClicked: if (!paste.running) paste.running = true
           }
 
           Row {

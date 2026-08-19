@@ -98,3 +98,28 @@ function isImage(item) {
 
 
 
+
+// What bin/sill-paste prints: one line a thing, a word saying what kind it is
+// and then the thing itself. An image has already been written to a file by
+// then, because the shelf holds files and holding a picture is only useful if
+// it can be pasted somewhere as one.
+function parsePaste(text) {
+  var urls = []
+  var lines = []
+
+  var rows = String(text || "").split("\n")
+  for (var i = 0; i < rows.length; i++) {
+    var tab = rows[i].indexOf("\t")
+    if (tab < 0) continue
+
+    var kind = rows[i].slice(0, tab)
+    var value = rows[i].slice(tab + 1)
+    if (value === "") continue
+
+    if (kind === "file") urls.push("file://" + value)
+    else if (kind === "uri") urls.push(value)
+    else if (kind === "text") lines.push(value)
+  }
+
+  return { urls: urls, text: lines.join("\n") }
+}

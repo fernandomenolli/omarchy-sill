@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.fernandomenolli.sill",
   "name": "Sill",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "author": "Fernando Menolli",
   "license": "MIT",
   "description": "A shelf on the bar. Drop files on it from anywhere, carry them across workspaces, and paste them where they belong.",

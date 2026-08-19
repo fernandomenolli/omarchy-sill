@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Puts whatever is on the clipboard onto the shelf.
+#
+#   sill-paste          prints a line the panel knows how to read
+#
+# The shelf takes what you drag onto it, and an image is the one thing you
+# cannot drag: dragging one out of a web page hands over a link to it, not the
+# picture. Copying it hands over the picture, so this is the way in.
+#
+# An image is written to a file, because the shelf holds files and the point of
+# holding it is to paste it somewhere as one. Everything else is passed through
+# as it is.
+
+set -uo pipefail
+
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/plugins/io.github.fernandomenolli.sill/images"
+
+types=$(wl-paste --list-types 2>/dev/null || true)
+[[ -n $types ]] || exit 0
+
+for mime in image/png image/jpeg image/webp image/gif; do
+  if grep -qx "$mime" <<<"$types"; then
+    mkdir -p "$STATE"
+    file="$STATE/pasted-$(date +'%Y-%m-%d_%H-%M-%S').${mime#image/}"
+    if wl-paste --type "$mime" > "$file" 2>/dev/null && [[ -s $file ]]; then
+      printf 'file\t%s\n' "$file"
+      exit 0
+    fi
+    rm -f "$file"
+  fi
+done
+
+# A file copied in a file manager arrives as this, one uri a line, with a
+# leading word saying whether it was a copy or a cut.
+if grep -qx 'x-special/gnome-copied-files' <<<"$types"; then
+  wl-paste --type x-special/gnome-copied-files 2>/dev/null |
+    sed '1{/^copy$/d;/^cut$/d}' |
+    while IFS= read -r uri; do
+      [[ -n $uri ]] && printf 'uri\t%s\n' "$uri"
+    done
+  exit 0
+fi
+
+text=$(wl-paste --no-newline 2>/dev/null || true)
+[[ -n $text ]] && printf 'text\t%s\n' "$text"
+exit 0

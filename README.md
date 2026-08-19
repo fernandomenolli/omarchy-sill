@@ -116,6 +116,28 @@ says.
 | Set a screenshot down as soon as it is taken | off | see below |
 | Maximum items | 25 | the oldest fall off the end |
 
+## The clipboard
+
+An image is the one thing you cannot drag onto the shelf. Dragging one out of a
+web page hands over a link to it rather than the picture, and holding a link is
+not holding the image.
+
+Copying it hands over the picture, so *Put the clipboard on the shelf* is the
+way in. An image is written to a file and held as one, because the point of
+keeping it is to paste it somewhere as a file. A file copied in a file manager
+comes in as that file. Anything else comes in as its text.
+
+Worth a key, since the whole point is not having to go anywhere:
+
+```lua
+-- ~/.config/hypr/bindings/sill.lua
+o.bind("SUPER + SHIFT + V", "Stash the clipboard",
+  "omarchy-shell io.github.fernandomenolli.sill stash")
+```
+
+Nothing leaves the machine to make this work, and nothing is downloaded: what
+is written to disk is what was already on your clipboard.
+
 ## Screenshots
 
 Turn on *Set a screenshot down as soon as it is taken* and every screenshot

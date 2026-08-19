@@ -95,3 +95,12 @@ test("filePaths leaves out what is gone", () => {
   eq(Shelf.filePaths(items, { "/a/gone.txt": true }), ["/a/here.txt"])
   eq(Shelf.checkablePaths(items), ["/a/here.txt", "/a/gone.txt"])
 })
+
+test("parsePaste reads what the clipboard handed over", () => {
+  eq(Shelf.parsePaste("file\t/a/pasted.png"), { urls: ["file:///a/pasted.png"], text: "" })
+  eq(Shelf.parsePaste("uri\tfile:///a/b.txt\nuri\tfile:///a/c.txt"),
+     { urls: ["file:///a/b.txt", "file:///a/c.txt"], text: "" })
+  eq(Shelf.parsePaste("text\tum lembrete"), { urls: [], text: "um lembrete" })
+  eq(Shelf.parsePaste(""), { urls: [], text: "" })
+  eq(Shelf.parsePaste("nonsense"), { urls: [], text: "" })
+})
